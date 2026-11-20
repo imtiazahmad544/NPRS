@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+nprs.db
+data/
+edge-queue/
+*.muse-github-snapshot-sync.json

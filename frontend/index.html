@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NPRS — Number Plate Recognition &amp; Vehicle Access Logging</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- ===================== Sign in ===================== -->
+<section id="login-view" class="login-wrap" aria-labelledby="login-title">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">NPRS</div>
+      <div>
+        <h1 id="login-title">Number Plate Recognition System</h1>
+        <p class="muted">Vehicle Access Logging · University Security</p>
+      </div>
+    </div>
+
+    <form id="login-form" novalidate>
+      <div class="field">
+        <label for="login-username">User name</label>
+        <input id="login-username" name="username" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <p id="login-error" class="error" role="alert" hidden></p>
+      <button class="btn primary block" type="submit">Sign In</button>
+    </form>
+
+    <form id="mfa-form" hidden novalidate>
+      <p>Enter the 6-digit code from your authenticator app.</p>
+      <div class="field">
+        <label for="mfa-code">Authentication code</label>
+        <input id="mfa-code" name="code" inputmode="numeric" autocomplete="one-time-code"
+               pattern="[0-9 ]*" maxlength="7" required>
+      </div>
+      <p id="mfa-error" class="error" role="alert" hidden></p>
+      <button class="btn primary block" type="submit">Verify and Sign In</button>
+      <button class="btn ghost block" type="button" id="mfa-back">Back</button>
+    </form>
+
+    <form id="force-password-form" hidden novalidate>
+      <p>Your password must be changed before you continue.</p>
+      <div class="field">
+        <label for="fp-current">Current password</label>
+        <input id="fp-current" type="password" autocomplete="current-password" required>
+      </div>
+      <div class="field">
+        <label for="fp-new">New password (at least 12 characters)</label>
+        <input id="fp-new" type="password" autocomplete="new-password" required minlength="12">
+      </div>
+      <p id="fp-error" class="error" role="alert" hidden></p>
+      <button class="btn primary block" type="submit">Change Password</button>
+    </form>
+
+    <p class="notice" id="site-notice">This gate is monitored by cameras. Vehicle images and plate numbers are recorded for access control and premises security.</p>
+  </div>
+</section>
+
+<!-- ===================== App shell ===================== -->
+<div id="app-view" class="shell" hidden>
+  <aside class="sidebar">
+    <div class="brand side">
+      <div class="brand-mark" aria-hidden="true">NPRS</div>
+      <div class="brand-text">Number Plate<br>Recognition</div>
+    </div>
+    <nav id="main-nav" aria-label="Main"></nav>
+    <div class="side-user">
+      <div id="side-user-name" class="side-user-name"></div>
+      <div id="side-user-role" class="muted small"></div>
+      <button class="btn ghost block" id="sign-out" type="button">Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <h2 id="page-title" tabindex="-1">Dashboard</h2>
+      <div class="topbar-right">
+        <span id="alert-badge" class="badge" hidden></span>
+        <span id="clock" class="muted" aria-label="Current time"></span>
+      </div>
+    </header>
+    <main id="main" class="main" tabindex="-1"></main>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-region" class="toasts" aria-live="polite" aria-atomic="false"></div>
+<div id="sr-announcer" class="sr-only" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

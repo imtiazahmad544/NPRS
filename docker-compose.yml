@@ -1,0 +1,33 @@
+# Production-shaped deployment (SDS §2, DC-04, NFR-POR-01).
+# The core runs against PostgreSQL 15+; images live on a named volume
+# (or an S3-compatible store via configuration, SW-02).
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: nprs
+      POSTGRES_USER: nprs
+      POSTGRES_PASSWORD: ${NPRS_DB_PASSWORD:?set NPRS_DB_PASSWORD}
+    volumes:
+      - nprs-db:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NPRS_DATABASE_URL: postgresql+psycopg2://nprs:${NPRS_DB_PASSWORD}@db:5432/nprs
+      NPRS_SECRET: ${NPRS_SECRET:?set NPRS_SECRET}
+      NPRS_IMAGE_DIR: /data/images
+    volumes:
+      - nprs-images:/data/images
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  nprs-db:
+  nprs-images:
