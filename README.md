@@ -41,18 +41,19 @@ pytest backend/tests -q
 
 ## Demo accounts (development only — change before any real use)
 
-All passwords: `NprsDemo#2026` · MFA (TOTP) is mandatory for the first two roles; use any authenticator app with the listed secret, or the code printed by `python edge/../backend/tools/totp.py <secret>`.
+All passwords: `NprsDemo#2026` · MFA (TOTP) is mandatory for System Administrators and Security Supervisors; add the listed secret to any authenticator app, or get the current code with `python backend/tools/totp.py <secret>`.
 
 | User name | Role | MFA secret (demo) |
 | --- | --- | --- |
-| admin.one / admin.two | System Administrator | `NPRSSAADMINSECRET01` → see seed |
-| imran.shah | Security Supervisor | see `backend/app/seed.py` |
-| ahmed.raza | Gate Operator | optional |
-| fatima.noor | Registry Manager | optional |
-| audit.ext | Auditor | optional |
-| khalid.m | Report Viewer | optional |
+| admin.one | System Administrator | `GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ` |
+| admin.two | System Administrator | `GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ` |
+| imran.shah | Security Supervisor | `JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP` |
+| ahmed.raza | Gate Operator | not required |
+| fatima.noor | Registry Manager | not required |
+| audit.ext | Auditor | not required |
+| khalid.m | Report Viewer | not required |
 
-The exact seeded secrets live in `backend/app/seed.py` and are printed at first startup. **They are demo values for a development environment, not production credentials.**
+**These are demo values for a development environment, not production credentials.**
 
 ## Repository layout
 
