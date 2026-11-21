@@ -785,6 +785,22 @@ def place_hold(body: LegalHoldIn, request: Request, db: DbSession = Depends(get_
     return {"id": hold.id}
 
 
+@router.get("/legal-holds")
+def list_holds(db: DbSession = Depends(get_db), user=Depends(require("legal.hold"))):
+    holds = (db.query(models.LegalHold).filter(models.LegalHold.released_at.is_(None))
+             .order_by(models.LegalHold.placed_at.desc()).all())
+    out = []
+    for h in holds:
+        ev = db.query(models.Event).filter_by(id=h.event_id).first()
+        out.append({"id": h.id, "event_id": h.event_id,
+                    "plate": (ev.plate_raw or ev.plate_normalised) if ev else "—",
+                    "event_ts": ev.ts.isoformat() if ev else None,
+                    "placed_by": h.placed_by,
+                    "placed_at": h.placed_at.isoformat() if h.placed_at else None,
+                    "reason": h.reason})
+    return {"holds": out}
+
+
 @router.delete("/legal-holds/{hold_id}")
 def release_hold(hold_id: str, request: Request, db: DbSession = Depends(get_db),
                  user=Depends(require("legal.hold"))):

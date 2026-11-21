@@ -7,7 +7,14 @@ denied UPDATE/DELETE on the table (DB-05).
 """
 import hashlib
 import json
+import threading
 from . import models
+
+# Audit writes are serialised process-wide and committed inside the lock:
+# the chain head must be read, linked and stored atomically, otherwise
+# concurrent requests (e.g. a browser loading several event images at
+# once, each view being audited) fork the chain and verification fails.
+_write_lock = threading.RLock()
 
 
 def _canonical(entry: dict) -> str:
@@ -26,32 +33,34 @@ def _ts_iso(dt) -> str:
 def write_audit(db, *, user=None, username="", role="", source_ip="",
                 action, object_type="", object_id="",
                 prev_value="", new_value="", result="success"):
-    # Chain head = the entry no other entry points back to. Robust even
-    # when several entries share a timestamp.
-    rows = db.query(models.AuditLog).all()
-    pointed = {r.prev_hash for r in rows}
-    heads = [r for r in rows if r.hash and r.hash not in pointed]
-    prev_hash = heads[0].hash if heads else ""
-    entry = models.AuditLog(
-        user_id=(user.id if user else None),
-        username=(user.username if user else username),
-        role=(user.role if user else role),
-        source_ip=source_ip, action=action, object_type=object_type,
-        object_id=str(object_id), prev_value=str(prev_value or ""),
-        new_value=str(new_value or ""), result=result, prev_hash=prev_hash,
-    )
-    db.add(entry)
-    db.flush()  # assigns id + ts
-    payload = {
-        "id": entry.id, "ts": _ts_iso(entry.ts), "user": entry.username,
-        "action": entry.action, "object_type": entry.object_type,
-        "object_id": entry.object_id, "prev_value": entry.prev_value,
-        "new_value": entry.new_value, "result": entry.result,
-        "prev_hash": prev_hash,
-    }
-    entry.hash = hashlib.sha256(_canonical(payload).encode()).hexdigest()
-    db.flush()
-    return entry
+    with _write_lock:
+        # Chain head = the entry no other entry points back to. Robust even
+        # when several entries share a timestamp.
+        rows = db.query(models.AuditLog).all()
+        pointed = {r.prev_hash for r in rows}
+        heads = [r for r in rows if r.hash and r.hash not in pointed]
+        prev_hash = heads[0].hash if heads else ""
+        entry = models.AuditLog(
+            user_id=(user.id if user else None),
+            username=(user.username if user else username),
+            role=(user.role if user else role),
+            source_ip=source_ip, action=action, object_type=object_type,
+            object_id=str(object_id), prev_value=str(prev_value or ""),
+            new_value=str(new_value or ""), result=result, prev_hash=prev_hash,
+        )
+        db.add(entry)
+        db.flush()  # assigns id + ts
+        payload = {
+            "id": entry.id, "ts": _ts_iso(entry.ts), "user": entry.username,
+            "action": entry.action, "object_type": entry.object_type,
+            "object_id": entry.object_id, "prev_value": entry.prev_value,
+            "new_value": entry.new_value, "result": entry.result,
+            "prev_hash": prev_hash,
+        }
+        entry.hash = hashlib.sha256(_canonical(payload).encode()).hexdigest()
+        db.flush()
+        db.commit()  # inside the lock: the next writer must see this entry
+        return entry
 
 
 def verify_chain(db):

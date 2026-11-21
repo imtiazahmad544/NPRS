@@ -280,3 +280,33 @@ def test_reports_generate_and_export(client, rv, sa):
     assert res.status_code == 200 and "text/csv" in res.headers["content-type"]
     res = client.get("/api/reports/daily-movement?format=pdf", headers=rv)
     assert res.status_code == 200 and res.content[:4] == b"%PDF"
+
+
+# ------------------------------------------------- audit chain (FR-AUD-04)
+
+def test_audit_chain_survives_concurrent_writes(client, au):
+    """Parallel audit writes (e.g. a browser loading many event images at
+    once, each view audited) must not fork the hash chain."""
+    import threading
+    from app import audit as audit_mod
+    from app.db import SessionLocal
+
+    def write_batch(n):
+        db = SessionLocal()
+        try:
+            for i in range(4):
+                audit_mod.write_audit(db, username="load.test", role="GO",
+                                      action="image_viewed",
+                                      object_type="event_image",
+                                      object_id=f"concurrent-{n}-{i}")
+        finally:
+            db.close()
+
+    threads = [threading.Thread(target=write_batch, args=(n,)) for n in range(10)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    res = client.get("/api/audit/verify", headers=au)
+    assert res.status_code == 200
+    assert res.json()["ok"] is True

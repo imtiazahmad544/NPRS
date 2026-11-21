@@ -213,7 +213,20 @@ def review_queue(db: DbSession = Depends(get_db), user=Depends(require("review.r
         out.append({"id": t.id, "reason": t.reason, "state": t.state,
                     "created_at": t.created_at.isoformat(),
                     "event": engine._event_to_dict(db, event)})
-    return {"waiting": len(out), "tasks": out}
+    day_start = engine.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    resolved = (db.query(models.ReviewTask)
+                .filter(models.ReviewTask.state == "resolved",
+                        models.ReviewTask.resolved_at >= day_start)
+                .order_by(models.ReviewTask.resolved_at.desc()).all())
+    resolved_out = []
+    for t in resolved:
+        event = db.query(models.Event).filter_by(id=t.event_id).first()
+        resolved_out.append({
+            "resolved_at": t.resolved_at.isoformat() if t.resolved_at else None,
+            "resolved_by": t.resolved_by or "",
+            "resolution": t.resolution or "",
+            "plate": (event.plate_raw or event.plate_normalised) if event else "—"})
+    return {"waiting": len(out), "tasks": out, "resolved_today": resolved_out}
 
 
 class ResolveIn(BaseModel):

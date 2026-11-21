@@ -84,30 +84,40 @@
   </div>
 </section>
 
-<!-- ===================== App shell ===================== -->
+<!-- ===================== App shell (Figma app frames) ===================== -->
 <div id="app-view" class="shell" hidden>
   <aside class="sidebar">
-    <div class="brand side">
-      <div class="brand-mark" aria-hidden="true">NPRS</div>
-      <div class="brand-text">Number Plate<br>Recognition</div>
+    <div class="side-brand">
+      <div class="side-logo" aria-hidden="true">NP</div>
+      <div>
+        <div class="side-name">NPRS</div>
+        <div class="side-tag">Vehicle Access Logging</div>
+      </div>
     </div>
     <nav id="main-nav" aria-label="Main"></nav>
     <div class="side-user">
-      <div id="side-user-name" class="side-user-name"></div>
-      <div id="side-user-role" class="muted small"></div>
-      <button class="btn ghost block" id="sign-out" type="button">Sign Out</button>
+      <div class="side-user-card">
+        <div id="side-user-name" class="side-user-name"></div>
+        <div id="side-user-role" class="side-user-sub"></div>
+        <div class="side-user-sub">Shift: 08:00 – 20:00</div>
+      </div>
+      <button class="logout-btn" id="sign-out" type="button">⇥&nbsp; Log out</button>
     </div>
   </aside>
 
   <div class="content">
     <header class="topbar">
-      <h2 id="page-title" tabindex="-1">Dashboard</h2>
+      <div>
+        <h2 id="page-title" tabindex="-1">Dashboard</h2>
+        <p id="page-sub" class="page-sub"></p>
+      </div>
       <div class="topbar-right">
-        <span id="alert-badge" class="badge" hidden></span>
-        <span id="clock" class="muted" aria-label="Current time"></span>
+        <span id="cam-pill" class="cam-pill" hidden></span>
+        <span id="clock" class="head-clock" aria-label="Current date and time"></span>
       </div>
     </header>
     <main id="main" class="main" tabindex="-1"></main>
+    <footer id="page-foot" class="page-foot"></footer>
   </div>
 </div>
 
