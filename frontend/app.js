@@ -152,11 +152,13 @@ $("#login-form").addEventListener("submit", async (e) => {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.detail || "Sign-in failed.");
+    $("#fp-current").value = $("#login-password").value;
     if (data.mfa_required) {
       state.challenge = data.challenge;
       $("#login-form").hidden = true;
       $("#mfa-form").hidden = false;
-      $("#mfa-code").focus();
+      otpBoxes.forEach((b) => { b.value = ""; }); syncOtp();
+      otpBoxes[0].focus();
       return;
     }
     finishLogin(data);
@@ -164,6 +166,26 @@ $("#login-form").addEventListener("submit", async (e) => {
 });
 $("#mfa-back").addEventListener("click", () => {
   $("#mfa-form").hidden = true; $("#login-form").hidden = false;
+});
+/* OTP digit boxes (design: six separate boxes) */
+const otpBoxes = [...document.querySelectorAll(".otp-box")];
+function syncOtp() { $("#mfa-code").value = otpBoxes.map((b) => b.value).join(""); }
+otpBoxes.forEach((box, i) => {
+  box.addEventListener("input", () => {
+    box.value = box.value.replace(/\D/g, "").slice(-1);
+    syncOtp();
+    if (box.value && i < otpBoxes.length - 1) otpBoxes[i + 1].focus();
+  });
+  box.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && !box.value && i > 0) otpBoxes[i - 1].focus();
+  });
+  box.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData.getData("text") || "").replace(/\D/g, "").slice(0, 6);
+    text.split("").forEach((ch, j) => { if (otpBoxes[j]) otpBoxes[j].value = ch; });
+    syncOtp();
+    otpBoxes[Math.min(text.length, 5)].focus();
+  });
 });
 $("#mfa-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -192,6 +214,8 @@ $("#force-password-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const err = $("#fp-error"); err.hidden = true;
   try {
+    if ($("#fp-new").value !== $("#fp-confirm").value)
+      throw new Error("The two passwords do not match — type the new password again.");
     await apiJson("/auth/password", { method: "POST", body: JSON.stringify({
       current_password: $("#fp-current").value, new_password: $("#fp-new").value }) });
     toast("Password changed.");

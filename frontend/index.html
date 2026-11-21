@@ -9,57 +9,78 @@
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 
-<!-- ===================== Sign in ===================== -->
-<section id="login-view" class="login-wrap" aria-labelledby="login-title">
-  <div class="login-card">
-    <div class="brand">
-      <div class="brand-mark" aria-hidden="true">NPRS</div>
-      <div>
-        <h1 id="login-title">Number Plate Recognition System</h1>
-        <p class="muted">Vehicle Access Logging · University Security</p>
-      </div>
+<!-- ===================== Sign in (Figma: 10 Auth) ===================== -->
+<section id="login-view" class="auth-wrap" aria-labelledby="login-title">
+  <div class="auth-brand">
+    <div class="auth-logo" aria-hidden="true">NP</div>
+    <div>
+      <div class="auth-name">NPRS</div>
+      <div class="auth-tag">Vehicle Access Logging</div>
     </div>
+  </div>
 
+  <div class="auth-card">
     <form id="login-form" novalidate>
+      <h1 id="login-title" class="auth-h">Sign in</h1>
+      <p class="auth-sub">Use the account given to you by the System Administrator.</p>
       <div class="field">
-        <label for="login-username">User name</label>
+        <label for="login-username">User name *</label>
         <input id="login-username" name="username" autocomplete="username" required>
       </div>
       <div class="field">
-        <label for="login-password">Password</label>
+        <label for="login-password">Password *</label>
         <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+        <p class="hint">Passwords are at least 12 characters (FR-SEC-01).</p>
       </div>
-      <p id="login-error" class="error" role="alert" hidden></p>
-      <button class="btn primary block" type="submit">Sign In</button>
+      <p id="login-error" class="alert-error" role="alert" hidden></p>
+      <button class="auth-btn" type="submit">Sign in</button>
+      <p class="auth-note">Forgot your password? The System Administrator can reset it — you will choose a new one at the next sign in (FR-SEC-09).</p>
+      <div class="auth-notice">
+        <div class="auth-notice-title">NOTICE</div>
+        <p>This gate is monitored by cameras. Vehicle images and plate numbers are recorded for access control and premises security (LEG-03).</p>
+      </div>
     </form>
 
     <form id="mfa-form" hidden novalidate>
-      <p>Enter the 6-digit code from your authenticator app.</p>
+      <h1 class="auth-h">Enter your one-time code</h1>
+      <p class="auth-sub">System Administrator and Security Supervisor accounts always confirm with a code from their authenticator app (FR-SEC-02).</p>
       <div class="field">
-        <label for="mfa-code">Authentication code</label>
-        <input id="mfa-code" name="code" inputmode="numeric" autocomplete="one-time-code"
-               pattern="[0-9 ]*" maxlength="7" required>
+        <span class="field-label" id="otp-label">6-digit code</span>
+        <div class="otp-row" role="group" aria-labelledby="otp-label">
+          <input class="otp-box" inputmode="numeric" autocomplete="one-time-code" aria-label="Digit 1">
+          <input class="otp-box" inputmode="numeric" aria-label="Digit 2">
+          <input class="otp-box" inputmode="numeric" aria-label="Digit 3">
+          <input class="otp-box" inputmode="numeric" aria-label="Digit 4">
+          <input class="otp-box" inputmode="numeric" aria-label="Digit 5">
+          <input class="otp-box" inputmode="numeric" aria-label="Digit 6">
+        </div>
+        <input id="mfa-code" type="hidden">
       </div>
-      <p id="mfa-error" class="error" role="alert" hidden></p>
-      <button class="btn primary block" type="submit">Verify and Sign In</button>
-      <button class="btn ghost block" type="button" id="mfa-back">Back</button>
+      <p id="mfa-error" class="alert-error" role="alert" hidden></p>
+      <button class="auth-btn" type="submit">Verify and sign in</button>
+      <button class="auth-btn-outline" type="button" id="mfa-back">Back</button>
+      <p class="auth-note">Lost your authenticator? The System Administrator can reset your enrolment after an identity check — the reset is audited (UN-42).</p>
+      <p class="auth-note">Codes change every 30 seconds. A code can be used once.</p>
     </form>
 
     <form id="force-password-form" hidden novalidate>
-      <p>Your password must be changed before you continue.</p>
+      <h1 class="auth-h">Choose a new password</h1>
+      <p class="auth-sub">Your password was reset by the System Administrator, so it must be changed before anything else opens (FR-SEC-09).</p>
+      <input id="fp-current" type="hidden">
       <div class="field">
-        <label for="fp-current">Current password</label>
-        <input id="fp-current" type="password" autocomplete="current-password" required>
-      </div>
-      <div class="field">
-        <label for="fp-new">New password (at least 12 characters)</label>
+        <label for="fp-new">New password *</label>
         <input id="fp-new" type="password" autocomplete="new-password" required minlength="12">
+        <p class="hint">At least 12 characters. It cannot be one of your last 5 passwords (FR-SEC-10).</p>
       </div>
-      <p id="fp-error" class="error" role="alert" hidden></p>
-      <button class="btn primary block" type="submit">Change Password</button>
+      <div class="field">
+        <label for="fp-confirm">Type it again *</label>
+        <input id="fp-confirm" type="password" autocomplete="new-password" required minlength="12">
+      </div>
+      <p id="fp-error" class="alert-error" role="alert" hidden></p>
+      <button class="auth-btn" type="submit">Save password and continue</button>
+      <p class="auth-note">Passwords are stored only as Argon2id salted hashes — nobody at the university can read yours (FR-SEC-01).</p>
+      <p class="auth-note">Sessions end after 15 minutes idle and after 12 hours in total (FR-SEC-04).</p>
     </form>
-
-    <p class="notice" id="site-notice">This gate is monitored by cameras. Vehicle images and plate numbers are recorded for access control and premises security.</p>
   </div>
 </section>
 
