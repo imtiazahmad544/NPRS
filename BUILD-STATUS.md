@@ -1,7 +1,7 @@
 # NPRS — Build Status
 
 What is built and what remains, against SRS-NPRS-001 v1.0 / SDS-NPRS-001 v1.0.
-Updated 20 November 2026. Full traceability: [`rtm/RTM.md`](rtm/RTM.md).
+**Release 1.0.0** — updated 24 November 2026. Full traceability: [`rtm/RTM.md`](rtm/RTM.md).
 
 ## Built ✅
 

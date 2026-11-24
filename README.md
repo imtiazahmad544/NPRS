@@ -2,6 +2,8 @@
 
 Automatic vehicle detection, number plate reading, and entry/exit logging with role-based access control — implemented against **SRS-NPRS-001 v1.0** and designed in **SDS-NPRS-001 v1.0**.
 
+**Version 1.0.0** (24 November 2026) — see [`CHANGELOG.md`](CHANGELOG.md) and [`BUILD-STATUS.md`](BUILD-STATUS.md).
+
 | Document | Location |
 | --- | --- |
 | Software Requirements Specification (SRS-NPRS-001 v1.0) | `docs/SRS-NPRS-001.docx` |
